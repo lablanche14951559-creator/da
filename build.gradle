@@ -6,9 +6,9 @@ plugins {
 group = 'org.ders'
 version = '1.0.0'
 
-// Поддержка Java 8 (совместимо с твоей JDK)
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+// Под Docker на Render используем Java 17
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -20,6 +20,9 @@ dependencies {
 }
 
 application {
-    // ВРЕМЕННО: запускаем тестовый класс для проверки доступа к Telegram API
     mainClass = 'org.ders.LogsBot'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }

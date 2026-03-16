@@ -8,11 +8,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpExchange;
+
 import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
@@ -56,8 +61,34 @@ public class LogsBot extends TelegramLongPollingBot {
     }
 
     public static void main(String[] args) throws Exception{
+        startHealthServer();
         TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
         api.registerBot(new LogsBot());
+    }
+
+    private static void startHealthServer() throws IOException {
+        // Render Web Service ожидает, что процесс будет слушать порт из переменной PORT.
+        // Поднимаем простой HTTP сервер для health-check.
+        int port = 10000;
+        String portEnv = System.getenv("PORT");
+        if (portEnv != null && !portEnv.isEmpty()) {
+            try {
+                port = Integer.parseInt(portEnv);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
+        server.createContext("/", (HttpExchange exchange) -> {
+            byte[] body = "ok".getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=utf-8");
+            exchange.sendResponseHeaders(200, body.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(body);
+            }
+        });
+        server.start();
+        System.out.println("Health server listening on port " + port);
     }
 
     public LogsBot(){
@@ -68,6 +99,8 @@ public class LogsBot extends TelegramLongPollingBot {
         this.dbUrl = getenvOrThrow("LOGIBOT_DB_URL");
         this.dbUser = getenvOrThrow("LOGIBOT_DB_USER");
         this.dbPass = getenvOrThrow("LOGIBOT_DB_PASS");
+
+        System.out.println("Bot initialized. allowedChatId=" + allowedChatId);
     }
 
 
