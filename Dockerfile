@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-# В git на Windows gradlew часто без executable-бита и/или с CRLF.
-RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew build -x test
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
+RUN ./gradlew build -x test --no-daemon
 
-CMD ["./gradlew", "run"]
+CMD ["java", "-jar", "build/libs/*.jar"]
