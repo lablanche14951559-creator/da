@@ -6,7 +6,6 @@ plugins {
 group = 'org.ders'
 version = '1.0.0'
 
-// Под Docker на Render используем Java 17
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
