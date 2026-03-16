@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.ders'
+version = '1.0.0'
+
+// Поддержка Java 8 (совместимо с твоей JDK)
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.telegram:telegrambots:6.9.7.1'
+    implementation 'org.postgresql:postgresql:42.7.3'
+}
+
+application {
+    // ВРЕМЕННО: запускаем тестовый класс для проверки доступа к Telegram API
+    mainClass = 'org.ders.LogsBot'
+}
