@@ -6,6 +6,7 @@ plugins {
 group = 'org.ders'
 version = '1.0.0'
 
+
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
@@ -24,12 +25,4 @@ application {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'org.ders.LogsBot'
-        )
-    }
 }
