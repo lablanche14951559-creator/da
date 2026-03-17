@@ -188,6 +188,8 @@ public class LogsBot extends TelegramLongPollingBot {
         String nickLike = nick;
 
         StringBuilder buf = new StringBuilder();
+        // Шапка файла (даже если строк нет)
+        buf.append("nick\tip\tserver\tdate\tmessage\n");
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
@@ -210,9 +212,7 @@ public class LogsBot extends TelegramLongPollingBot {
             ps.setInt(7, limit);
 
             try(ResultSet rs = ps.executeQuery()){
-                boolean any = false;
                 while(rs.next()){
-                    any = true;
                     Timestamp ts = rs.getTimestamp("dt");
                     String dtStr = ts.toLocalDateTime().format(fmt);
                     String line = rs.getString("nick") + "\t" +
@@ -221,10 +221,6 @@ public class LogsBot extends TelegramLongPollingBot {
                             dtStr + "\t" +
                             rs.getString("message") + "\n";
                     buf.append(line);
-                }
-                if(!any){
-                    sendText(chatId, "Ничего не найдено.");
-                    return;
                 }
             }
         }
