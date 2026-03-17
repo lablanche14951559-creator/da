@@ -231,11 +231,27 @@ public class LogsBot extends TelegramLongPollingBot {
         doc.setChatId(Long.toString(chatId));
         InputFile file = new InputFile(in, "logs.txt");
         doc.setDocument(file);
+        doc.setCaption(
+                "Лимит: " + limit + "\n" +
+                "Сервер: " + prettyFilter(server) + "\n" +
+                "Ник: " + prettyFilter(nick) + "\n" +
+                "Запрос: " + prettyFilter(query)
+        );
         try {
             execute(doc);
         } finally {
             in.close();
         }
+    }
+
+    private static String prettyFilter(String v) {
+        if (v == null || v.isEmpty()) {
+            return "% (Любой)";
+        }
+        if ("%".equals(v)) {
+            return "% (Любой)";
+        }
+        return v;
     }
 
     private static String wrapLike(String s) {
