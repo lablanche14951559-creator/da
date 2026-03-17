@@ -29,6 +29,7 @@ public class LogsBot extends TelegramLongPollingBot {
     private final String botUsername;
     private final String botToken;
     private final long allowedChatId;
+    private final long testUserId;
     private final String dbUrl;
     private final String dbUser;
     private final String dbPass;
@@ -91,6 +92,19 @@ public class LogsBot extends TelegramLongPollingBot {
         this.botToken = getenvOrThrow("LOGIBOT_TOKEN");
         this.botUsername = "logibot";
         this.allowedChatId = Long.parseLong(getenvOrThrow("LOGIBOT_CHAT_ID"));
+        String testUserEnv = System.getenv("LOGIBOT_TEST_USER_ID");
+        if (testUserEnv == null || testUserEnv.isEmpty()) {
+            testUserEnv = LOCAL_ENV.get("LOGIBOT_TEST_USER_ID");
+        }
+        long parsedTestUserId = 0;
+        if (testUserEnv != null && !testUserEnv.isEmpty()) {
+            try {
+                parsedTestUserId = Long.parseLong(testUserEnv);
+            } catch (NumberFormatException ignored) {
+                parsedTestUserId = 0;
+            }
+        }
+        this.testUserId = parsedTestUserId;
 
         this.dbUrl = getenvOrThrow("LOGIBOT_DB_URL");
         this.dbUser = getenvOrThrow("LOGIBOT_DB_USER");
@@ -130,7 +144,15 @@ public class LogsBot extends TelegramLongPollingBot {
         System.out.println("UPDATE chatId=" + chatId);
 
         if (chatId != allowedChatId) {
-            return;
+            if (testUserId == 0) {
+                return;
+            }
+            if (update.getMessage().getChat() == null || !update.getMessage().getChat().isUserChat()) {
+                return;
+            }
+            if (update.getMessage().getFrom() == null || update.getMessage().getFrom().getId() != testUserId) {
+                return;
+            }
         }
         String text = update.getMessage().getText().trim();
         if (text.isEmpty()) {
