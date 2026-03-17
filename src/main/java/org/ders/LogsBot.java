@@ -36,7 +36,6 @@ public class LogsBot extends TelegramLongPollingBot {
     private static final Map<String, String> LOCAL_ENV = new HashMap<>();
 
     static {
-        // Пробуем загрузить переменные из файла .env в корне проекта
         File envFile = new File(".env");
         if (envFile.exists()) {
             try (BufferedReader br = new BufferedReader(new FileReader(envFile))) {
@@ -48,7 +47,6 @@ public class LogsBot extends TelegramLongPollingBot {
                     if (eq <= 0) continue;
                     String key = line.substring(0, eq).trim();
                     String value = line.substring(eq + 1).trim();
-                    // убираем кавычки, если есть
                     if ((value.startsWith("\"") && value.endsWith("\"")) ||
                         (value.startsWith("'") && value.endsWith("'"))) {
                         value = value.substring(1, value.length() - 1);
@@ -67,8 +65,6 @@ public class LogsBot extends TelegramLongPollingBot {
     }
 
     private static void startHealthServer() throws IOException {
-        // Render Web Service ожидает, что процесс будет слушать порт из переменной PORT.
-        // Поднимаем простой HTTP сервер для health-check.
         int port = 10000;
         String portEnv = System.getenv("PORT");
         if (portEnv != null && !portEnv.isEmpty()) {
@@ -131,10 +127,8 @@ public class LogsBot extends TelegramLongPollingBot {
             return;
         }
         long chatId = update.getMessage().getChatId();
-        // Логируем только chatId, чтобы не было каши из-за кодировки консоли
         System.out.println("UPDATE chatId=" + chatId);
 
-        // Фильтр: работаем только в одном чате
         if (chatId != allowedChatId) {
             return;
         }
@@ -188,7 +182,6 @@ public class LogsBot extends TelegramLongPollingBot {
         String nickLike = nick;
 
         StringBuilder buf = new StringBuilder();
-        // Шапка файла (даже если строк нет)
         buf.append("nick\tip\tserver\tdate\tmessage\n");
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -269,7 +262,6 @@ public class LogsBot extends TelegramLongPollingBot {
         for (int i = 1; i < parts.length; i++) {
             String nick = parts[i].trim();
             if (nick.isEmpty()) continue;
-            // TODO: здесь будет отправка команды на сервер, например через RCON:
             // rconSend("/hsp " + nick);
             info.append("- ").append(nick).append("\n");
         }
