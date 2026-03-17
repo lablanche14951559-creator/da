@@ -1,10 +1,13 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'org.ders'
 version = '1.0.0'
+
+archivesBaseName = 'logibot'
 
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -25,4 +28,11 @@ application {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    archiveClassifier = 'all'
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
 }
